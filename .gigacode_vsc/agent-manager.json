@@ -1,0 +1,24 @@
+{
+  "worktrees": {
+    "wt-1788779127966-1": {
+      "branch": "delicious-harbor",
+      "path": "d:\\_dev\\STLab\\.gigacode_vsc\\worktrees\\delicious-harbor",
+      "parentBranch": "dev",
+      "createdAt": "2026-09-07T11:05:27.966Z"
+    }
+  },
+  "sessions": {
+    "ses_f84749a95ffeDhx3dm3hnG9tC7": {
+      "worktreeId": "wt-1788779127966-1",
+      "createdAt": "2026-09-07T11:05:28.286Z"
+    }
+  },
+  "tabOrder": {
+    "local": [
+      "pending:1"
+    ]
+  },
+  "worktreeOrder": [
+    "wt-1788779127966-1"
+  ]
+}
