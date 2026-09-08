@@ -1,0 +1,12 @@
+FUNCTION_BLOCK Conveyer_FB
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+VAR_IN_OUT
+	Data: ConveyerType;
+END_VAR
+
+Data.ComRotateLent := NOT Data.BoxOnEndPosition;

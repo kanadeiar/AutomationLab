@@ -15,9 +15,10 @@
 ### Структура папок
 ```st
 Project/ 
-├── <Логика управления>/ ← Алгоритмы
-├── <Вспомогатльеные>/ ← HW, HMI
-├── <Технологические объекты>/ ← FBs, POUs 
+├── Logic/ ← Алгоритмы
+├── Support/ ← HW, HMI, вспомогательное
+├── TechnologyObject/ ← FBs, POUs, технологический объект
+├── PLC_PRG.st             ← Главный циклический вызов
 └── GVL.st
 ```
 
@@ -25,16 +26,18 @@ Project/
 | Постфикс | Тип | Пример |
 |---------|-----|--------|
 | `_PRG` | Program | `PLC_PRG` |
-| `GVL` | Global Variable List | `GVL.DI_Sensor` |
 | `Type` | Data type | `ConveyorType` |
-| `Data` | Data | `ConveyerData` |
+| `_DB` | Data | `Conveyer_DB` |
 | `_FB` | Function block | `Conveyer_FB` |
 | `_FC` | Function | `Conveyer_FC` |
 | `_DB` | Datablock | `Conveyer_DB` |
+| `_HW` | Hardware abstraction | `Hardware_HW` |
+| `_HMI` | HMI interface | `Interface_HMI` |
 
 | Префикс | Тип | Пример |
-| `HW_` | Hardware abstraction | `HW_MotorStart` |
-| `HMI_` | HMI interface | `HMI_StateDisplay` |
+| `GVL.*` | Global Variable List | `GVL.DI_Sensor` |
+| `DI_` | Input Hardware Signal | `DI_Sensor` |
+| `DO_` | Output Hardware Signal | `DO_Motor` |
 
 ## Правила GVL
 

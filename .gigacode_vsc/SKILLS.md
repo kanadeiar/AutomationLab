@@ -96,7 +96,7 @@ END_WHILE;
 #### Массивы и структуры
 ```st
 (* Объявление структуры *)
-TYPE MyStruct :
+TYPE MyStructType :
 STRUCT
     Value     : INT;
     Active    : BOOL;
@@ -116,7 +116,7 @@ item.Value := 50;
 
 #### FUNCTION_BLOCK — объявление
 ```st
-FUNCTION_BLOCK FB_Conveyor
+FUNCTION_BLOCK Conveyor_FB
 VAR_INPUT
     Start: BOOL;
     Stop: BOOL;
@@ -140,7 +140,7 @@ END_VAR
 ```st
 (* Объявление экземпляра *)
 VAR
-    conveyor1: FB_Conveyor;
+    conveyor1: Conveyor_FB;
     timer1: TON;
 END_VAR
 
@@ -268,79 +268,113 @@ END_VAR
 #### 1. Организация проекта
 ```st
 Project/
-├── <Технологический объект>/
-│   ├── ConveyerMain.st         ← Главный блок технологического объекта
-│   ├── ConveyerObjectType.pou  ← Тип данных о конвейерах объекта
-│   └── <Модель управления технологической логикой>/
-│       ├── ConveyerType.pou    ← Тип данных о одном конвейера    
-│       ├── Conveyer1.st     ← Технологический объект конвейера 1
-│       └── Conveyer2.st     ← Технологический объект конвейера 2       ├── 
-├── <Логика управления>/
-│   ├── AlwaysOn.st     ← Логика работы всегда влючить при разрешении
-│   └── OnOffWork.st    ← Логика работы работать от включения и до отключения
-├── <Вспомогательное>/
-│   ├── HW_Hardware.st     ← Абстракция аппаратуры, железа
-│   └── HMI_Interface.st   ← Данные физическому миру - кнопкам, лампочкам и сенсорной панели оператора
-├── <Главная программа>.st ← Главный циклический вызов
-└── GVL.st                 ← Глобальные переменные, ввода/вывода CoDeSys
+├── TechnologyObject/           ← Ядро технологического приложения
+│   ├── ConveyerMain_FB.st      ← Главный блок технологического объекта
+│   ├── ConveyerObjectType.st   ← Тип данных о конвейерах объекта
+│   ├── Model/                  ← Технологическая модель управления
+│   |   ├── ConveyerType.st     ← Тип данных о одном конвейера    
+│   |   ├── Conveyer1_FB.st        ← Технологический объект конвейера 1
+│   |   ├── Conveyer2_FB.st        ← Технологический объект конвейера 2
+│   |   └── Logic/                 ← Алгоритмы и логика управления
+│   |       ├── AlwaysOn_FC.st     ← Логика работы всегда влючить при разрешении
+│   |       └── OnOffWork_FB.st    ← Логика работы работать от включения и до отключения
+│   └── Support/               ← Вспомогательные блоки
+│       ├── Hardware_HW.st     ← Абстракция аппаратуры, железа
+│       └── Interface_HMI.st   ← Данные физическому миру - кнопкам, лампочкам и сенсорной панели оператора
+├── PLC_PRG.st                 ← Главный циклический вызов
+└── GVL.st                     ← Глобальные переменные, ввода/вывода CoDeSys
 ```
 
-#### 2. Глобальная переменная (GVL)
+#### 2. Глобальные переменные (GVL)
 ```st
 (* GVL.st — ОДИН экземпляр, RETAIN *)
 VAR_GLOBAL CONSTANT
-    SETTING1_TIME      : TIME := T#10ms;
+    SETTING1_TIME: TIME := T#10ms; // Время настройки 1
 END_VAR
 
 VAR_GLOBAL RETAIN
     (* Состояние системы — сохраняется при отключении *)
-    SystemState     : INT;
+    SystemState: INT; // Состояние системы
 END_VAR
 
 VAR_GLOBAL
     (* Мгновенные данные — сбрасываются при старте *)
-	SensorA:BOOL;
-	SensorB:BOOL;
-	SwRotate:BOOL;
-	MotorConveyer1:BOOL;
-	MotorConveyer2:BOOL;
+	SensorA: BOOL; // Датчик на конце ленты
+	SensorB: BOOL; // Датчик в середи не ленты
+	SwRotate: BOOL; // Датчик в начале ленты
+	CommmandRotateLent1: BOOL; // Команда двигать ленту конвейера
+	CommmandWorkMotor: BOOL; // Команда работать двигателю
 END_VAR
 ```
 
-#### 3. Главный блок техологического объекта
+#### 3. Тип хранения данных
+Пользовательский тип хранения промежуточных данных для передачи в технологические функциональные блоки, где информация читается и записывается. Блоком хардвар - сопряжения с аппаратурой в эти блоки записываются сигналы с датчиков и из этого блока читается сигнал на двигатели, насосы, исполнительные механизмы.
 ```st
-PROGRAM ConveyerMain
+TYPE ConveyerType :
+STRUCT
+	BoxOnEndPosition:BOOL; // Коробка на конечной позиции
+	ComRotateLent:BOOL; // Команда вращать ленту 
+END_STRUCT
+END_TYPE
+```
+
+#### 4. Хардвар блок
+Блок сопряжения данных проекта с аппаратурой.
+Принимает на вход пользовательский тип данных, работает сразу с глобальными переменными.
+```st
+FUNCTION_BLOCK Hardware_HW
+VAR
+	data: ConveyerType; // Блок данных конвейера
+END_VAR
+
+data.BoxOnEndPosition := GVL.SensorA;
+GVL.Lamp := data.ComRotateLent;
+
+```
+
+#### 5. Интерфейс блок
+Блок сопряжения данных проекта с аппаратурой.
+Принимает на вход пользовательский тип данных, работает сразу с глобальными переменными.
+```st
+FUNCTION_BLOCK Interface_HMI
+VAR
+	data: ConveyerType; // Блок данных конвейера
+END_VAR
+
+GVL.Lamp := data.ComRotateLent;
+
+```
+
+#### 6. Блок техологического объекта
+Блок вызова как блоков харвар, так и блоков интерфесных, которые относятся именно к этому технологическому объекту.
+Вызывает на выполнение блоки технологической логики. Содержит в себе данные о работе технологического объекта.
+```st
+PROGRAM MainConveyer_FB
 VAR
 	ObjectData: ConveyerObjectType;
-	HW_Handler: HW_Hardware;
-	HMI_Handler: HMI_Interface;
-	Conveyer1: Conveyer1_FB;
-	Conveyer2: Conveyer2_FB;
+	hard: Hardware_HW;
+	inter: Interface_HMI;
+	conveyer1: Conveyer1_FB;
+	conveyer2: Conveyer2_FB;
 END_VAR
 
 
 
 (* Чтение входов - запись выходов / Абстракция аппаратной части, железа *)
-Hardware(
-    SensorA:= GVL.SensorA, 
-    SensorB:= GVL.SensorB, 
-    MotorLent1=> GVL.MotorConveyer1, 
-    MotorLent2=> GVL.MotorConveyer2, 
+hard(
     Conveyer1:= ObjectData.Conveyer1, 
     Conveyer2:= ObjectData.Conveyer2);
 
 (* Запись в панель оператора, лампы и чтение кнопок *)
-HMIInterface(
-    SwRotate:= GVL.SwRotate, 
-    Conveyer1:= ObjectData.Conveyer1);
+inter(Conveyer1:= ObjectData.Conveyer1);
     
 (* Технологический блок конвейера 1 *)
-Conveyer1(
+conveyer1(
     SwRotate:= ObjectData.Conveyer1.SwRotating, 
     RotateLent=> ObjectData.Conveyer1.ComRotateLent);
 
 (* Технологический блок конвейера 2 *)
-Conveyer2(
+conveyer2(
     BoxOnInput:= ObjectData.Conveyer2.SensorInput, 
     BoxOnOutput:= ObjectData.Conveyer2.SensorOutput, 
     RotateLent=> ObjectData.Conveyer2.ComRotateLent);
@@ -348,24 +382,25 @@ Conveyer2(
 
 ```
 
-#### 4. Главный блок программы
+#### 7. Главный блок программы
+Циклично вызывается циклической задачей программируемого логического контроллера.
 ```st
 PROGRAM PLC_PRG
 VAR
-	conveyer: ConveyerMain;
+	main: ConveyerMain;
 END_VAR
 
 
 
 (* Технологический объект - конвейер *)
-conveyer();
+main();
 
 
 ```
 
-#### 5. Паттерн состояния (State Machine)
+#### 8. Паттерн состояния (State Machine)
 ```st
-FUNCTION_BLOCK FB_StateMachine
+FUNCTION_BLOCK StateMachine_FB
 VAR_INPUT
     Reset       : BOOL;
     Run         : BOOL;
@@ -417,7 +452,7 @@ VAR
 END_VAR
 
 (* 3. Вызов FB без экземпляра *)
-сonveyor(Start := TRUE);  // ОШИБКА!
+Conveyor_FB(Start := TRUE);  // ОШИБКА!
 
 (* 4. Мутация входных параметров *)
 VAR_INPUT
@@ -438,7 +473,7 @@ END_VAR
 
 (* 3. Экземпляр FB *)
 VAR
-    conveyor : FB_Conveyor;
+    conveyor : Conveyor_FB;
 END_VAR
 conveyor(Start := TRUE);
 
