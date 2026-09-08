@@ -3,10 +3,7 @@
 // ============================================
 PROGRAM PLC_PRG
 VAR
-    conveyer: Conveyer_Main; // Технологический блок конвейера
+
 END_VAR
 
-BEGIN
-    (* 1. Технологический блок — обработка логики конвейера *)
-    conveyer();
-END_PROGRAM
+GVL.Motor := NOT GVL.SensorA;

@@ -13,7 +13,8 @@
 - Сравнение: `=`, `<>`, `<`, `>`, `<=`, `>=`
 - Логические: `AND`, `OR`, `NOT`, `XOR`
 - Арифметика: `+`, `-`, `*`, `/`, `MOD`
-- В CoDeSys не нужно ставить ключевые слова начала и окончания блока кода - `BEGIN` и `END*`
+- В CoDeSys не нужно ставить ключевые слова начала и окончания блока кода - `BEGIN` и `END_PROGRAM`, `END_FUNCTION_BLOCK`
+- Код пишеться сразу после блоков объявления переменных
 
 ### Базовые типы данных
 
@@ -132,9 +133,7 @@ VAR
     state: INT;
 END_VAR
 
-BEGIN
-    (* Логика блока *)
-END_FUNCTION_BLOCK
+(* Логика блока *)
 ```
 
 #### Вызов FB с использованием экземпляров
@@ -319,34 +318,34 @@ VAR
 	Conveyer2: Conveyer2_FB;
 END_VAR
 
-BEGIN
 
-    (* Чтение входов - запись выходов / Абстракция аппаратной части, железа *)
-    Hardware(
-        SensorA:= GVL.SensorA, 
-        SensorB:= GVL.SensorB, 
-        MotorLent1=> GVL.MotorConveyer1, 
-        MotorLent2=> GVL.MotorConveyer2, 
-        Conveyer1:= ObjectData.Conveyer1, 
-        Conveyer2:= ObjectData.Conveyer2);
 
-    (* Запись в панель оператора, лампы и чтение кнопок *)
-    HMIInterface(
-        SwRotate:= GVL.SwRotate, 
-        Conveyer1:= ObjectData.Conveyer1);
-        
-    (* Технологический блок конвейера 1 *)
-    Conveyer1(
-        SwRotate:= ObjectData.Conveyer1.SwRotating, 
-        RotateLent=> ObjectData.Conveyer1.ComRotateLent);
+(* Чтение входов - запись выходов / Абстракция аппаратной части, железа *)
+Hardware(
+    SensorA:= GVL.SensorA, 
+    SensorB:= GVL.SensorB, 
+    MotorLent1=> GVL.MotorConveyer1, 
+    MotorLent2=> GVL.MotorConveyer2, 
+    Conveyer1:= ObjectData.Conveyer1, 
+    Conveyer2:= ObjectData.Conveyer2);
 
-    (* Технологический блок конвейера 2 *)
-    Conveyer2(
-        BoxOnInput:= ObjectData.Conveyer2.SensorInput, 
-        BoxOnOutput:= ObjectData.Conveyer2.SensorOutput, 
-        RotateLent=> ObjectData.Conveyer2.ComRotateLent);
+(* Запись в панель оператора, лампы и чтение кнопок *)
+HMIInterface(
+    SwRotate:= GVL.SwRotate, 
+    Conveyer1:= ObjectData.Conveyer1);
+    
+(* Технологический блок конвейера 1 *)
+Conveyer1(
+    SwRotate:= ObjectData.Conveyer1.SwRotating, 
+    RotateLent=> ObjectData.Conveyer1.ComRotateLent);
 
-END_PROGRAM
+(* Технологический блок конвейера 2 *)
+Conveyer2(
+    BoxOnInput:= ObjectData.Conveyer2.SensorInput, 
+    BoxOnOutput:= ObjectData.Conveyer2.SensorOutput, 
+    RotateLent=> ObjectData.Conveyer2.ComRotateLent);
+
+
 ```
 
 #### 4. Главный блок программы
@@ -356,12 +355,12 @@ VAR
 	conveyer: ConveyerMain;
 END_VAR
 
-BEGIN
 
-    (* Технологический объект - конвейер *)
-    conveyer();
 
-END_PROGRAM
+(* Технологический объект - конвейер *)
+conveyer();
+
+
 ```
 
 #### 5. Паттерн состояния (State Machine)
@@ -382,28 +381,28 @@ VAR
     state       : INT := 0;
 END_VAR
 
-BEGIN
-    IF Reset THEN
-        state := 0;
-        Done := FALSE;
-        Error := FALSE;
-    ELSIF Run THEN
-        CASE state OF
-            0: (* Idle *)
-                state := 1;
-            1: (* Start *)
-                state := 2;
-            2: (* Running *)
-                IF DoneCondition THEN
-                    state := 3;
-                END_IF;
-            3: (* Stop *)
-                state := 0;
-        END_CASE;
-    END_IF;
-    
-    CurrentState := state;
-END_FUNCTION_BLOCK
+
+IF Reset THEN
+    state := 0;
+    Done := FALSE;
+    Error := FALSE;
+ELSIF Run THEN
+    CASE state OF
+        0: (* Idle *)
+            state := 1;
+        1: (* Start *)
+            state := 2;
+        2: (* Running *)
+            IF DoneCondition THEN
+                state := 3;
+            END_IF;
+        3: (* Stop *)
+            state := 0;
+    END_CASE;
+END_IF;
+
+CurrentState := state;
+
 ```
 
 ### Частые ошибки и антипаттерны
@@ -414,11 +413,11 @@ IF %IX0.0 THEN ... END_IF;
 
 (* 2. Нет RETAIN для сохраняемых данных *)
 VAR
-    Counter : INT;  // сбросится при отключении!
+    сounter : INT;  // сбросится при отключении!
 END_VAR
 
 (* 3. Вызов FB без экземпляра *)
-FB_Conveyor(Start := TRUE);  // ОШИБКА!
+сonveyor(Start := TRUE);  // ОШИБКА!
 
 (* 4. Мутация входных параметров *)
 VAR_INPUT
