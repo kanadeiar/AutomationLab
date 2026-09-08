@@ -6,4 +6,4 @@ VAR
 
 END_VAR
 
-GVL.Motor := NOT GVL.SensorA;
+(* код сюда *)

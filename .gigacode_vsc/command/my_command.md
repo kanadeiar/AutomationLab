@@ -1,4 +1,4 @@
-# name: my-review
+# name: review
 # description: Запустить код-ревью текущей PR
 
 Проведи код-ревью изменений:
