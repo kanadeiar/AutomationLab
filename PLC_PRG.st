@@ -3,7 +3,9 @@
 // ============================================
 PROGRAM PLC_PRG
 VAR
-
+    // Технологический блок конвейера
+    mainConveyer: MainConveyer_FB;
 END_VAR
 
-(* код сюда *)
+// Циклическое выполнение
+mainConveyer();
