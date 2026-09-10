@@ -5,21 +5,25 @@ VAR_OUTPUT
 END_VAR
 VAR
     // Данные конвейера (каталог объекта)
-    data: ConveyerType;
+    data: DT_Conveyer;
     // Алгоритмический блок обработки конвейера
     conveyer: Conveyer_FB;
-    // Блок сопряжения с аппаратурой
-    hardware: Conveyer_Hardware_FB;
+    // Блок сопряжения с аппаратурой (вход: чтение датчика)
+    hardwareIn: Conveyer_HardwareIn_FB;
+    // Блок сопряжения с аппаратурой (выход: запись на двигатель)
+    hardwareOut: Conveyer_HardwareOut_FB;
     // Блок интерфейса пульта оператора
     hmi: Conveyer_HMI_FB;
 END_VAR
 
-// Циклическое выполнение алгоритма
+// 1. Вход: чтение датчика и обновление Data.BoxOnEndPosition
+hardwareIn(Data := data);
+
+// 2. Логика: вычисление команды Data.ComRotateLent
 conveyer(Data := data);
 
-// Подключение блока хардвар
-hardware(Data := data);
+// 3. Выход: запись команды на двигатель
+hardwareOut(Data := data);
 
-// Подключение блока интерфейса
+// 4. Интерфейс: индикация работы лампой
 hmi(Data := data);
-

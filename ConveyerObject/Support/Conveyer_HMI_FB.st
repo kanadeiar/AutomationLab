@@ -4,7 +4,7 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR_IN_OUT
-    Data: ConveyerType;
+    Data: DT_Conveyer;
 END_VAR
 
 // Сигнализация работы конвейера — лампа для оператора

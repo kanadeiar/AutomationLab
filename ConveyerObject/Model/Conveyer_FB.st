@@ -6,7 +6,7 @@ END_VAR
 VAR
 END_VAR
 VAR_IN_OUT
-	Data: ConveyerType;
+	Data: DT_Conveyer;
 END_VAR
 
 Data.ComRotateLent := NOT Data.BoxOnEndPosition;
