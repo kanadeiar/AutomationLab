@@ -19,14 +19,12 @@ AutomationLab/
 ├── PLC_PRG.st                            ← Главная циклично вызываемая программа
 ├── GVL.st                                ← Глобальные переменные (входы/выходы)
 └── ConveyerObject/                       ← Технологический объект "Конвейер"
-    ├── DT_Conveyer.st                    ← Тип данных объекта (STRUCT)
-    ├── MainConveyer_FB.st                ← Блок-агрегатор объекта: вызывает все блоки
+    ├── ConveyerType.st                   ← Тип данных объекта (STRUCT)
+    ├── Main.st                           ← Блок-агрегатор объекта: вызывает все блоки
     ├── Model/
-    │   └── Conveyer_FB.st                ← Чистая технологическая логика
+    │   └── Conveyer.st                   ← Чистая технологическая логика
     └── Support/
-        ├── Conveyer_HardwareIn_FB.st      ← Сопряжение с аппаратурой (вход: чтение датчика)
-        ├── Conveyer_HardwareOut_FB.st     ← Сопряжение с аппаратурой (выход: запись на двигатель)
-        └── Conveyer_HMI_FB.st            ← Интерфейс оператора (лампа работы)
+        └── Hardware.st      ← Сопряжение с аппаратурой
 ```
 
 ### Поток данных за один цикл сканера
@@ -35,13 +33,12 @@ AutomationLab/
 GVL.DI_SensorA (вход)
         │
         ▼
-Conveyer_HardwareIn_FB ──► Data.BoxOnEndPosition (антидребезг TON 50 мс)
+Hardware ──► Data.BoxOnEndPosition
         │
         ▼
-Conveyer_FB ──► Data.ComRotateLent (логика: NOT BoxOnEndPosition)
+Conveyer ──► Data.ComRotateLent (логика: NOT BoxOnEndPosition)
         │
-        ├──► Conveyer_HardwareOut_FB ──► GVL.DO_ComMotor (двигатель)
-        └──► Conveyer_HMI_FB ──► GVL.DO_LampWork (лампа)
+        └──► Hardware ──► GVL.DO_ComMotor (двигатель)
 ```
 
 ### Назначение блоков
@@ -49,11 +46,9 @@ Conveyer_FB ──► Data.ComRotateLent (логика: NOT BoxOnEndPosition)
 | Блок | Ответственность |
 | ------ | ----------------- |
 | `PLC_PRG` | Точка входа, циклический вызов объекта конвейера |
-| `MainConveyer_FB` | Владеет данными (`DT_Conveyer`), вызывает модель, железо и HMI |
-| `Conveyer_FB` | Алгоритм: команда на вращение ленты в зависимости от положения коробки |
-| `Conveyer_HardwareIn_FB` | Вход: чтение датчика (с антидребезгом через `TON`) |
-| `Conveyer_HardwareOut_FB` | Выход: запись команды на двигатель |
-| `Conveyer_HMI_FB` | Индикация работы конвейера лампой |
+| `Main` | Владеет данными (`ConveyerType`), вызывает модель, железо и HMI |
+| `Conveyer` | Алгоритм: команда на вращение ленты в зависимости от положения коробки |
+| `Hardware` | Вход: чтение датчика и запись на двигатель |
 
 ### Глобальные переменные (GVL.st)
 
@@ -61,7 +56,6 @@ Conveyer_FB ──► Data.ComRotateLent (логика: NOT BoxOnEndPosition)
 | ----- | ------------- | ------------ |
 | `DI_SensorA` | Вход | Оптический НЗ датчик на конце ленты |
 | `DO_ComMotor` | Выход | Команда на двигатель конвейера |
-| `DO_LampWork` | Выход | Лампа работы конвейера |
 
 ## Соглашения
 
@@ -78,8 +72,8 @@ Conveyer_FB ──► Data.ComRotateLent (логика: NOT BoxOnEndPosition)
 1. Открой CoDeSys v3 и создай новый проект под целевое устройство (Овен ПЛК210) или используй профиль для симуляции.
 2. Импортируй/создай объекты в дереве проекта согласно структуре выше:
    - `GVL.st` → Global Variable List `GVL`;
-   - `DT_Conveyer.st` → DUT (Data Unit Type) `DT_Conveyer`;
-   - `*_FB.st` → Function Blocks с соответствующими именами;
+   - `ConveyerType.st` → DUT (Data Unit Type) `ConveyerType`;
+   - `*.st` → Function Blocks с соответствующими именами;
    - `PLC_PRG.st` → Program `PLC_PRG`, назначенный на циклическую задачу (MainTask, рекомендуется период 10 мс).
 3. Выполни **Build → Generate Code** (F11) — компиляция должна пройти без ошибок.
 
@@ -93,7 +87,7 @@ Conveyer_FB ──► Data.ComRotateLent (логика: NOT BoxOnEndPosition)
 
 - **Force Write** (F7) — принудительно задать значение `DI_SensorA` для проверки логики без физического датчика.
 - **Write** (Ctrl+F7) — однократная запись значения в переменную.
-- Мониторинг: добавь `GVL` и `data` (внутри `MainConveyer_FB`) в таблицу наблюдения Watch.
+- Мониторинг: добавь `GVL` и `data` (внутри `Main`) в таблицу наблюдения Watch.
 - Проверка сценария «коробка подъехала»: установи `DI_SensorA := FALSE` (НЗ датчик разомкнулся) — двигатель должен остановиться, лампа погаснуть; верни `TRUE` — конвейер снова поедет.
 
 ### Примечание о симуляции

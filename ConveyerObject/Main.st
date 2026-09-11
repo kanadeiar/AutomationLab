@@ -17,7 +17,7 @@ END_VAR
 // ============================================
 
 // Циклическое выполнение алгоритма
-conv(Data := data);
+conveyer(Data := data);
 
 // Подключение блока хардвар
 hard(SensorA:= GVL.DI_SensorA, ComMotor=> GVL.DO_ComMotor, Data:= data);
