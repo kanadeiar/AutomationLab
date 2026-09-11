@@ -28,6 +28,11 @@
 
 Учебный опытно-экспериментальный проект для решения множества различных учебных задач.
 
+Первая задача: Управление конвейером
+Логика: НЗ датчик, остановка ленты при обнаружении коробки
+Тип датчика: нормально замкнутый
+
+
 ---
 
 ## 3. Стиль кода и соглашения
@@ -368,11 +373,11 @@ PROGRAM Main
 VAR
 	data: ConveyerObjectType;
 	hard: Hardware_HW;
-	inter: HMIInterface;
+	interf: HMIInterface;
 	conveyer: Conveyer;
 END_VAR
    
-(* Технологический блок конвейера 1 *)
+(* Технологический блок конвейера *)
 conveyer(Data:= data);
 
 (* Чтение входов - запись выходов / Абстракция аппаратной части, железа *)
@@ -380,11 +385,37 @@ conveyer(Data:= data);
 hard(SensorA:= GVL.DI_SensorA, ComMotor=> GVL.DO_ComMotor, Data:= data);
 
 (* Запись в панель оператора, лампы и чтение кнопок *)
-inter(Lamp=> GVL.DO_Lamp, Conveyer1:= data);
+interf(Lamp=> GVL.DO_Lamp, Conveyer1:= data);
 
 ```
 
-#### 7. Главный блок программы
+#### 7. Технологическое устройство
+Модель управления технологическим устройством
+```
+FUNCTION_BLOCK Conveyer
+VAR_IN_OUT
+	Data: ConveyerType;
+END_VAR
+
+(* Логический блок - всегда включить, пока есть разрешение работы *)
+Data.ComRotateLent := AlwaysOn(Allow:= NOT Data.BoxOnEndPosition);
+
+```
+
+
+#### 8. Логический блок
+Алгоритм, логика, исполнительный код выполняющий основную работу
+```
+FUNCTION AlwaysOn : BOOL
+VAR_INPUT
+	Allow:BOOL;
+END_VAR
+
+AlwaysOn := Allow; // Всегда включать когда есть разрешение
+```
+
+
+#### 9. Главный блок программы
 Циклично вызывается циклической задачей программируемого логического контроллера.
 ```st
 PROGRAM PLC_PRG
