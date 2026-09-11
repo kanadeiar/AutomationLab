@@ -6,6 +6,4 @@ VAR_GLOBAL
     DI_SensorA: BOOL;
     // Команда на работу двигателя конвейера
     DO_ComMotor: BOOL;
-    // Лампа работы конвейера
-    DO_LampWork: BOOL;
 END_VAR
