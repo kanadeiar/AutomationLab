@@ -1,12 +1,21 @@
 FUNCTION_BLOCK Conveyer1
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
+VAR
+    // Логический блок управления лентой конвейера
+    logic: LogicDevice;
 END_VAR
 VAR_IN_OUT
-	Data: ConveyorType;
+    // Данные технологического объекта конвейера
+    Data: ConveyorType;
 END_VAR
 
+// ============================================
+// УСТРОЙСТВО — МОДЕЛЬ УПРАВЛЕНИЯ КОНВЕЙЕРОМ
+// ============================================
+// Принимает данные с датчиков через структуру ConveyorType,
+// вызывает логику принятия решения (LogicDevice)
+// и записывает команду на вращение ленты обратно в структуру.
+// ============================================
 
-
-Data.ComRotateBelt := (Data.BoxOnStartPosition OR Data.ComRotateBelt) AND NOT Data.BoxOnEndPosition;
+// Логика: появление коробки на старте запускает ленту,
+// достижение конца — останавливает
+logic(BoxOnStart:= Data.BoxOnStartPosition, BoxOnEnd:= Data.BoxOnEndPosition, ComRotate=> Data.ComRotateBelt);

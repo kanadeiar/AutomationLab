@@ -1,13 +1,22 @@
 FUNCTION_BLOCK ConveyorMain
-VAR_INPUT
-END_VAR
-VAR_OUTPUT
-END_VAR
 VAR
+    data: ConveyorType;
+    dev: Conveyer1;
+    hard: Hardware;
+    interf: HMIInterface;
 END_VAR
 
 // ============================================
-// Технологический объект конвейер
+// ТЕХНОЛОГИЧЕСКИЙ ОБЪЕКТ КОНВЕЙЕР
 // ============================================
+
+// Устройство: технологическая логика управления лентой
+dev(Data:= data);
+
+// Аппаратура: чтение датчиков, запись на двигатель
+hard(SensorA:= GVL.DI_SensorA, SensorB:= GVL.DI_SensorB, ComMotor=> GVL.DO_ComMotor, Data:= data);
+
+// HMI: интерфейс с панелью оператора
+interf(Data:= data);
 
 
