@@ -6,7 +6,7 @@ VAR_OUTPUT
 	ComMotor: BOOL;
 END_VAR
 VAR_IN_OUT
-    Data: ConveyerType;	
+    Data: ConveyorType;
 END_VAR
 
 
@@ -16,4 +16,4 @@ END_VAR
 Data.BoxOnEndPosition := NOT SensorA;
 
 // Запись команды двигателя
-ComMotor := Data.ComRotateLent;
+ComMotor := Data.ComRotateBelt;

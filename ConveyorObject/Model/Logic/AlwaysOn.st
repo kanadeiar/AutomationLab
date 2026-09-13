@@ -1,6 +1,6 @@
-FUNCTION AlwaysOn : BOOL
+FUNCTION AlwaysOn: BOOL
 VAR_INPUT
-	Allow:BOOL;
+	Allow: BOOL;
 END_VAR
 VAR
 END_VAR

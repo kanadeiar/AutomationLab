@@ -1,8 +1,8 @@
-TYPE ConveyerType:
+TYPE ConveyorType:
 STRUCT
 	// Коробка на конце ленты (от оптического датчика)
 	BoxOnEndPosition: BOOL := FALSE;
 	// Команда на вращение ленты
-	ComRotateLent: BOOL := FALSE;
+	ComRotateBelt: BOOL := FALSE;
 END_STRUCT
 END_TYPE

@@ -1,13 +1,13 @@
-FUNCTION_BLOCK Main
+FUNCTION_BLOCK ConveyorMain
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
     // Данные конвейера (каталог объекта)
-    data: ConveyerType;
+    data: ConveyorType;
     // Алгоритмический блок обработки конвейера
-    conveyer: Conveyer;
+    conveyor: Conveyor;
     // Блок сопряжения с аппаратурой
     hard: Hardware;
 END_VAR
@@ -17,8 +17,7 @@ END_VAR
 // ============================================
 
 // Циклическое выполнение алгоритма
-conveyer(Data := data);
+conveyor(Data := data);
 
-// Подключение блока хардвар
-hard(SensorA:= GVL.DI_SensorA, ComMotor=> GVL.DO_ComMotor, Data:= data);
-
+// Подключение блока хардвер
+hard(SensorA := GVL.DI_SensorA, ComMotor => GVL.DO_ComMotor, Data := data);

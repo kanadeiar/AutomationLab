@@ -1,7 +1,7 @@
 PROGRAM PLC_PRG
 VAR
     // Технологический блок конвейера
-    main: Main;
+    main: ConveyorMain;
 END_VAR
 
 // ============================================
