@@ -285,9 +285,10 @@ AutomationLab/
 ├── GVL.st                  ← Глобальные переменные ввода/вывода
 ├── TechnologyObject/       ← Ядро технологического приложения
 │   ├── Main.st             ← Чистый оркестратор (без обращений к GVL)
-│   ├── Hardware.st         ← Чтение датчиков из GVL (только вход)
+│   ├── HardwareInput.st    ← Чтение датчиков из GVL (только вход)
 │   ├── HardwareOutput.st   ← Запись команд в GVL (только выход)
-│   ├── LogicDevice.st      ← Чистая логика управления (RS-триггер, ПИД и т.д.)
+│   ├── Logic/              ← Чистая логика управления (RS-триггер, ПИД и т.д.)
+│   │   └── LogicDevice.st  ← Чистая логика управления 
 │   └── HMIInterface.st     ← Сопряжение с панелью оператора (лампы, кнопки)
 └── README.md
 ```
@@ -296,11 +297,11 @@ AutomationLab/
 
 1. **Нет STRUCT-посредников** — данные передаются через BOOL/INT на входах/выходах FB
 2. **Main — чистый оркестратор** — ни одного обращения к GVL, только соединение блоков
-3. **Hardware** — только читает GVL-датчики, не пишет
+3. **HardwareInput** — только читает GVL-датчики, не пишет
 4. **HardwareOutput** — только пишет в GVL-выходы, не читает
 5. **LogicDevice — чистая логика** — не знает о GVL, датчиках или исполнительных механизмах
 6. **HMIInterface** — только пишет в GVL лампочки, читает кнопки
-7. **Легко портируется** — при смене ПЛК меняются только Hardware, HardwareOutput, HMIInterface
+7. **Легко портируется** — при смене ПЛК меняются только HardwareInput, HardwareOutput, HMIInterface
 
 ### Шаблон назначения блоков
 
@@ -362,10 +363,10 @@ hardOut(ComRotate:= logic.ComRotate);
 hmi(BeltRun:= logic.ComRotate);
 ```
 
-#### Hardware.st (только чтение)
+#### HardwareInput.st (только чтение)
 
 ```st
-FUNCTION_BLOCK Hardware
+FUNCTION_BLOCK HardwareInput
 VAR_OUTPUT
     BoxOnStart: BOOL;
     BoxOnEnd: BOOL;
