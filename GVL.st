@@ -9,5 +9,5 @@ VAR_GLOBAL
     // Команда на работу двигателя конвейера
     DO_ComMotor: BOOL;
     // Лампочка на панели оператора: лента работает
-    DO_LampRun: BOOL;
+    DO_LampWork: BOOL;
 END_VAR

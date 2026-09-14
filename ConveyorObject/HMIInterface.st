@@ -13,4 +13,4 @@ END_VAR
 // ============================================
 
 // Лампочка "Лента работает" горит, пока BeltRun = TRUE
-GVL.DO_LampRun := BeltRun;
+GVL.DO_LampWork := BeltRun;
