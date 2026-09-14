@@ -1,22 +1,29 @@
 FUNCTION_BLOCK ConveyorMain
 VAR
-    data: ConveyorType;
-    dev: Conveyer1;
-    hard: Hardware;
-    interf: HMIInterface;
+    hardIn: HardwareInput;
+    logic: LogicDevice;
+    hardOut: HardwareOutput;
+    hmi: HMIInterface;
 END_VAR
 
 // ============================================
-// ТЕХНОЛОГИЧЕСКИЙ ОБЪЕКТ КОНВЕЙЕР
+// ЧИСТЫЙ ОРКЕСТРАТОР КОНВЕЙЕРА
+// ============================================
+// НЕ ИСПОЛЬЗУЕТ GVL. Только соединяет блоки:
+// Hardware -> LogicDevice -> HardwareOutput -> HMIInterface
 // ============================================
 
-// Устройство: технологическая логика управления лентой
-dev(Data:= data);
+// Шаг 1: Hardware читает датчики из GVL -> BoxOnStart/BoxOnEnd
+hardIn();
 
-// Аппаратура: чтение датчиков, запись на двигатель
-hard(SensorA:= GVL.DI_SensorA, SensorB:= GVL.DI_SensorB, ComMotor=> GVL.DO_ComMotor, Data:= data);
+// Шаг 2: LogicDevice вычисляет команду (RS-триггер с самоподхватом)
+logic(BoxOnStart:= hardIn.BoxOnStart,
+      BoxOnEnd:= hardIn.BoxOnEnd);
 
-// HMI: интерфейс с панелью оператора
-interf(Data:= data);
+// Шаг 3: HardwareOutput пишет команду на двигатель в GVL
+hardOut(ComRotate:= logic.ComRotate);
+
+// Шаг 4: HMIInterface зажигает лампочку на панели
+hmi(BeltRun:= logic.ComRotate);
 
 
