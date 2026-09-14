@@ -48,14 +48,7 @@
 ### CoDeSys v3 (Овен ПЛК210)
 
 1. Создай новый проект под целевое устройство.
-2. Импортируй объекты в дереве проекта:
-   - `GVL.st` → Global Variable List `GVL`
-   - `ConveyorMain.st` → Function Block `ConveyorMain`
-   - `HardwareInput.st` → Function Block `HardwareInput`
-   - `HardwareOutput.st` → Function Block `HardwareOutput`
-   - `LogicDevice.st` → Function Block `LogicDevice`
-   - `HMIInterface.st` → Function Block `HMIInterface`
-   - `PLC_PRG.st` → Program `PLC_PRG` (назначить на MainTask, период 10 мс)
+2. Импортируй объекты в дереве проекта.
 3. **Build → Generate Code** (F11).
 
 ### Онлайн-отладка
