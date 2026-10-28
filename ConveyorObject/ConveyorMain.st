@@ -1,8 +1,7 @@
 FUNCTION_BLOCK ConveyorMain
 VAR
-    hardIn: HardwareInput;
     logic: LogicDevice;
-    hardOut: HardwareOutput;
+    hard: Hardware;
     hmi: HMIInterface;
 END_VAR
 
@@ -10,20 +9,17 @@ END_VAR
 // ЧИСТЫЙ ОРКЕСТРАТОР КОНВЕЙЕРА
 // ============================================
 // НЕ ИСПОЛЬЗУЕТ GVL. Только соединяет блоки:
-// Hardware -> LogicDevice -> HardwareOutput -> HMIInterface
+// Hardware -> LogicDevice -> HMIInterface
 // ============================================
 
-// Шаг 1: Hardware читает датчики из GVL -> BoxOnStart/BoxOnEnd
-hardIn();
+// Шаг 1: Hardware читает сигналы и пишет команду на двигатель
+hard(ComRotate:= logic.ComRotate);
 
 // Шаг 2: LogicDevice вычисляет команду (RS-триггер с самоподхватом)
-logic(BoxOnStart:= hardIn.BoxOnStart,
-      BoxOnEnd:= hardIn.BoxOnEnd);
+logic(BoxOnStart:= hard.BoxOnStart,
+      BoxOnEnd:= hard.BoxOnEnd);
 
-// Шаг 3: HardwareOutput пишет команду на двигатель в GVL
-hardOut(ComRotate:= logic.ComRotate);
-
-// Шаг 4: HMIInterface зажигает лампочку на панели
+// Шаг 3: HMIInterface зажигает лампочку на панели
 hmi(BeltRun:= logic.ComRotate);
 
 
